@@ -58,15 +58,68 @@ class ContractionList extends StatelessWidget {
                 ),
               ),
             ),
-            ...items.map((c) => _ContractionTile(
+            ...List.generate(items.length, (j) {
+              final c = items[j];
+              final widgets = <Widget>[
+                _ContractionTile(
                   contraction: c,
                   formatTime: _formatTime,
                   formatDuration: _formatDuration,
                   onDelete: () => provider.delete(c.id!),
-                )),
+                ),
+              ];
+
+              if (j < items.length - 1) {
+                final older = items[j + 1];
+                if (older.endTime != null) {
+                  final gap = c.startTime.difference(older.endTime!);
+                  if (gap > Duration.zero) {
+                    widgets.add(_IntervalBadge(interval: gap, formatDuration: _formatDuration));
+                  }
+                }
+              }
+
+              return Column(mainAxisSize: MainAxisSize.min, children: widgets);
+            }),
           ],
         );
       },
+    );
+  }
+}
+
+class _IntervalBadge extends StatelessWidget {
+  final Duration interval;
+  final String Function(Duration) formatDuration;
+
+  const _IntervalBadge({required this.interval, required this.formatDuration});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Row(
+        children: [
+          Expanded(child: Divider(color: Colors.grey.shade300, height: 1)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.arrow_downward, size: 12, color: Colors.grey.shade500),
+                const SizedBox(width: 4),
+                Text(
+                  '${formatDuration(interval)} de intervalo',
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.arrow_downward, size: 12, color: Colors.grey.shade500),
+              ],
+            ),
+          ),
+          Expanded(child: Divider(color: Colors.grey.shade300, height: 1)),
+        ],
+      ),
     );
   }
 }

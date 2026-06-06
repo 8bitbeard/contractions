@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/contraction_button.dart';
 import '../widgets/contraction_list.dart';
+import '../widgets/stats_section.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -28,7 +29,8 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const ContractionList(),
-            const SizedBox(height: 24),
+            const Divider(),
+            const StatsSection(),
           ],
         ),
       ),
