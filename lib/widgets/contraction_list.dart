@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/contraction.dart';
@@ -11,11 +12,47 @@ class ContractionList extends StatelessWidget {
 
   String _formatDate(DateTime dt) => DateFormat('EEEE, d MMMM y', 'pt_BR').format(dt);
 
-  String _formatDuration(Duration d) {
+  static String formatDuration(Duration d) {
     final s = d.inSeconds.remainder(60);
     if (d.inMinutes == 0) return '${s}s';
     if (s == 0) return '${d.inMinutes}min';
     return '${d.inMinutes}min ${s}s';
+  }
+
+  Future<void> _showEditDialog(BuildContext context, Contraction c, ContractionProvider provider) async {
+    final newDuration = await showDialog<Duration>(
+      context: context,
+      builder: (_) => _EditDurationDialog(contraction: c),
+    );
+    if (newDuration != null) {
+      final updated = c.copyWith(endTime: c.startTime.add(newDuration));
+      await provider.updateContraction(updated);
+    }
+  }
+
+  Future<void> _confirmDelete(BuildContext context, Contraction c, ContractionProvider provider) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Excluir contração?'),
+        content: Text(
+          'Início: ${DateFormat('HH:mm:ss').format(c.startTime)}'
+          '${c.endTime != null ? '\nFim: ${DateFormat('HH:mm:ss').format(c.endTime!)}' : ''}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await provider.delete(c.id!);
   }
 
   @override
@@ -64,8 +101,8 @@ class ContractionList extends StatelessWidget {
                 _ContractionTile(
                   contraction: c,
                   formatTime: _formatTime,
-                  formatDuration: _formatDuration,
-                  onDelete: () => provider.delete(c.id!),
+                  onEdit: c.isActive ? null : () => _showEditDialog(context, c, provider),
+                  onDelete: () => _confirmDelete(context, c, provider),
                 ),
               ];
 
@@ -74,7 +111,7 @@ class ContractionList extends StatelessWidget {
                 if (older.endTime != null) {
                   final gap = c.startTime.difference(older.endTime!);
                   if (gap > Duration.zero) {
-                    widgets.add(_IntervalBadge(interval: gap, formatDuration: _formatDuration));
+                    widgets.add(_IntervalBadge(interval: gap));
                   }
                 }
               }
@@ -90,9 +127,8 @@ class ContractionList extends StatelessWidget {
 
 class _IntervalBadge extends StatelessWidget {
   final Duration interval;
-  final String Function(Duration) formatDuration;
 
-  const _IntervalBadge({required this.interval, required this.formatDuration});
+  const _IntervalBadge({required this.interval});
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +145,7 @@ class _IntervalBadge extends StatelessWidget {
                 Icon(Icons.arrow_downward, size: 12, color: Colors.grey.shade500),
                 const SizedBox(width: 4),
                 Text(
-                  '${formatDuration(interval)} de intervalo',
+                  '${ContractionList.formatDuration(interval)} de intervalo',
                   style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                 ),
                 const SizedBox(width: 4),
@@ -127,13 +163,13 @@ class _IntervalBadge extends StatelessWidget {
 class _ContractionTile extends StatelessWidget {
   final Contraction contraction;
   final String Function(DateTime) formatTime;
-  final String Function(Duration) formatDuration;
+  final VoidCallback? onEdit;
   final VoidCallback onDelete;
 
   const _ContractionTile({
     required this.contraction,
     required this.formatTime,
-    required this.formatDuration,
+    required this.onEdit,
     required this.onDelete,
   });
 
@@ -141,74 +177,180 @@ class _ContractionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isActive = contraction.isActive;
     final duration = contraction.duration;
+    final theme = Theme.of(context);
 
-    return Dismissible(
-      key: ValueKey(contraction.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: isActive
+            ? theme.colorScheme.error.withAlpha(30)
+            : theme.colorScheme.primaryContainer,
+        child: Icon(
+          isActive ? Icons.timer : Icons.check,
+          color: isActive ? theme.colorScheme.error : theme.colorScheme.primary,
+          size: 20,
+        ),
       ),
-      confirmDismiss: (_) async {
-        return await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Excluir contração?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancelar'),
+      title: Text(
+        isActive
+            ? 'Em andamento — ${formatTime(contraction.startTime)}'
+            : '${formatTime(contraction.startTime)} → ${formatTime(contraction.endTime!)}',
+        style: const TextStyle(fontSize: 14),
+      ),
+      subtitle: isActive
+          ? null
+          : Text(
+              'Duração: ${ContractionList.formatDuration(duration!)}',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+            ),
+      trailing: isActive
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.error,
+                borderRadius: BorderRadius.circular(12),
               ),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Excluir', style: TextStyle(color: Colors.red)),
+              child: const Text(
+                'ATIVA',
+                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  color: theme.colorScheme.primary,
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'Editar',
+                  onPressed: onEdit,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outlined, size: 18),
+                  color: theme.colorScheme.error,
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'Excluir',
+                  onPressed: onDelete,
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class _EditDurationDialog extends StatefulWidget {
+  final Contraction contraction;
+
+  const _EditDurationDialog({required this.contraction});
+
+  @override
+  State<_EditDurationDialog> createState() => _EditDurationDialogState();
+}
+
+class _EditDurationDialogState extends State<_EditDurationDialog> {
+  late final TextEditingController _minCtrl;
+  late final TextEditingController _secCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    final d = widget.contraction.duration ?? Duration.zero;
+    _minCtrl = TextEditingController(text: d.inMinutes.toString());
+    _secCtrl = TextEditingController(text: d.inSeconds.remainder(60).toString());
+  }
+
+  @override
+  void dispose() {
+    _minCtrl.dispose();
+    _secCtrl.dispose();
+    super.dispose();
+  }
+
+  Duration get _currentDuration {
+    final m = int.tryParse(_minCtrl.text) ?? 0;
+    final s = int.tryParse(_secCtrl.text) ?? 0;
+    return Duration(minutes: m, seconds: s);
+  }
+
+  void _save() {
+    final d = _currentDuration;
+    if (d <= Duration.zero) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('A duração deve ser maior que zero.')),
+      );
+      return;
+    }
+    Navigator.pop(context, d);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fmt = DateFormat('HH:mm:ss');
+    return AlertDialog(
+      title: const Text('Editar duração'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Início: ${fmt.format(widget.contraction.startTime)}',
+            style: const TextStyle(fontSize: 13, color: Colors.grey),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _minCtrl,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'Minutos',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text(':', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _secCtrl,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'Segundos',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
               ),
             ],
           ),
-        );
-      },
-      onDismissed: (_) => onDelete(),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: isActive
-              ? Theme.of(context).colorScheme.error.withAlpha(30)
-              : Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(
-            isActive ? Icons.timer : Icons.check,
-            color: isActive
-                ? Theme.of(context).colorScheme.error
-                : Theme.of(context).colorScheme.primary,
-            size: 20,
+          const SizedBox(height: 12),
+          AnimatedOpacity(
+            opacity: _currentDuration > Duration.zero ? 1 : 0,
+            duration: const Duration(milliseconds: 200),
+            child: Text(
+              'Novo fim: ${fmt.format(widget.contraction.startTime.add(_currentDuration))}',
+              style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
+            ),
           ),
-        ),
-        title: Text(
-          isActive
-              ? 'Em andamento — ${formatTime(contraction.startTime)}'
-              : '${formatTime(contraction.startTime)} → ${formatTime(contraction.endTime!)}',
-          style: const TextStyle(fontSize: 14),
-        ),
-        subtitle: isActive
-            ? null
-            : Text(
-                'Duração: ${formatDuration(duration!)}',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-              ),
-        trailing: isActive
-            ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.error,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'ATIVA',
-                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              )
-            : null,
+        ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: _save,
+          child: const Text('Salvar'),
+        ),
+      ],
     );
   }
 }

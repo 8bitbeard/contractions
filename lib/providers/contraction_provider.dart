@@ -72,6 +72,13 @@ class ContractionProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> updateContraction(Contraction updated) async {
+    await DatabaseHelper.instance.update(updated);
+    final idx = _contractions.indexWhere((c) => c.id == updated.id);
+    if (idx != -1) _contractions[idx] = updated;
+    notifyListeners();
+  }
+
   Future<void> delete(int id) async {
     await DatabaseHelper.instance.delete(id);
     _contractions.removeWhere((c) => c.id == id);
