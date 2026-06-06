@@ -72,6 +72,27 @@ class ContractionProvider extends ChangeNotifier {
     });
   }
 
+  bool get shouldShowLaborAlert {
+    final cutoff = DateTime.now().subtract(const Duration(hours: 1));
+    final recent = _contractions
+        .where((c) => c.startTime.isAfter(cutoff))
+        .toList()
+      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+
+    if (recent.length <= 5) return false;
+
+    bool hasInterval = false;
+    for (int i = 1; i < recent.length; i++) {
+      final prev = recent[i - 1];
+      if (prev.endTime == null) continue;
+      hasInterval = true;
+      final gap = recent[i].startTime.difference(prev.endTime!);
+      if (gap > const Duration(minutes: 10)) return false;
+    }
+
+    return hasInterval;
+  }
+
   Future<void> updateContraction(Contraction updated) async {
     await DatabaseHelper.instance.update(updated);
     final idx = _contractions.indexWhere((c) => c.id == updated.id);

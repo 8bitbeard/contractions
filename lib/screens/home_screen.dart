@@ -1,11 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/contraction_provider.dart';
 import '../widgets/contraction_button.dart';
 import '../widgets/contraction_list.dart';
 import '../widgets/stats_section.dart';
 import '../widgets/summary_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  ContractionProvider? _provider;
+  bool _alertShown = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = context.read<ContractionProvider>();
+    if (_provider != provider) {
+      _provider?.removeListener(_onUpdate);
+      _provider = provider;
+      _provider!.addListener(_onUpdate);
+    }
+  }
+
+  @override
+  void dispose() {
+    _provider?.removeListener(_onUpdate);
+    super.dispose();
+  }
+
+  void _onUpdate() {
+    if (!mounted) return;
+    final shouldAlert = _provider!.shouldShowLaborAlert;
+
+    if (!shouldAlert) {
+      if (_alertShown) setState(() => _alertShown = false);
+      return;
+    }
+
+    if (!_alertShown) {
+      setState(() => _alertShown = true);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showLaborAlert();
+      });
+    }
+  }
+
+  void _showLaborAlert() {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        icon: Icon(
+          Icons.favorite_rounded,
+          size: 44,
+          color: theme.colorScheme.primary,
+        ),
+        title: const Text(
+          'Suas contrações estão bem frequentes! 🌸',
+          textAlign: TextAlign.center,
+        ),
+        content: const Text(
+          'Percebemos que suas contrações estão ocorrendo com intervalos de '
+          '10 minutos ou menos — isso é um sinal muito importante de que o '
+          'trabalho de parto ativo pode estar começando.\n\n'
+          'Agora é uma ótima hora para acionar seu plano de parto: avise seu '
+          'acompanhante, entre em contato com seu médico ou obstetra e '
+          'considere se dirigir à maternidade.\n\n'
+          'Você está arrasando, mamãe! Respira fundo, mantém a calma e '
+          'confia no seu corpo — você foi feita para isso. 💜',
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Entendi, vou me preparar!'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
