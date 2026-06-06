@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import '../models/contraction.dart';
 import '../database/database_helper.dart';
 
-class ContractionProvider extends ChangeNotifier {
+class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
   List<Contraction> _contractions = [];
   Contraction? _activeContraction;
   Timer? _ticker;
@@ -24,14 +24,22 @@ class ContractionProvider extends ChangeNotifier {
   }
 
   Future<void> load() async {
+    WidgetsBinding.instance.addObserver(this);
     _contractions = await DatabaseHelper.instance.getAll();
-    // recover an active contraction that was never closed (app killed mid-contraction)
     final open = _contractions.where((c) => c.isActive).toList();
     if (open.isNotEmpty) {
       _activeContraction = open.first;
       _startTicker();
     }
     notifyListeners();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _activeContraction != null) {
+      _elapsed = DateTime.now().difference(_activeContraction!.startTime);
+      notifyListeners();
+    }
   }
 
   Future<void> toggleContraction() async {
@@ -108,6 +116,7 @@ class ContractionProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _ticker?.cancel();
     super.dispose();
   }
