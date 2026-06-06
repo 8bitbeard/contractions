@@ -64,7 +64,8 @@ class _StatsSectionState extends State<StatsSection> {
             ),
             eventLoader: (day) {
               final k = DateTime(day.year, day.month, day.day);
-              return grouped[k] ?? [];
+              final events = grouped[k] ?? [];
+              return events.isEmpty ? [] : [events.first];
             },
             onDaySelected: (selected, focused) {
               setState(() {

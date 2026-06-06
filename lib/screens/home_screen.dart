@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/contraction_button.dart';
 import '../widgets/contraction_list.dart';
 import '../widgets/stats_section.dart';
+import '../widgets/summary_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,7 +20,9 @@ class HomeScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 40),
             const Center(child: ContractionButton()),
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
+            const SummaryBar(),
+            const SizedBox(height: 16),
             const Divider(),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
