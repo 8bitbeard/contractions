@@ -143,41 +143,50 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ],
                   ),
-                  if (_showButton)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: AnimatedOpacity(
+                      opacity: _showButton ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeInOut,
                       child: IgnorePointer(
-                        child: Container(
-                          height: 72,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                theme.colorScheme.surface.withAlpha(0),
-                                theme.colorScheme.surface,
-                              ],
+                        ignoring: !_showButton,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IgnorePointer(
+                              child: Container(
+                                height: 220,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      theme.colorScheme.surface.withAlpha(0),
+                                      theme.colorScheme.surface.withAlpha(230),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            Container(
+                              color: theme.colorScheme.surface.withAlpha(230),
+                              padding: const EdgeInsets.only(top: 4, bottom: 6),
+                              child: Center(
+                                child: ContractionButton(
+                                  onContractionCompleted: _checkLaborAlert,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                  ),
                 ],
               ),
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeInOut,
-              child: _showButton
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 6),
-                      child: Center(
-                        child: ContractionButton(onContractionCompleted: _checkLaborAlert),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
             ),
           ],
         ),
