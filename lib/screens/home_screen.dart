@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: const [
                             ContractionList(),
-                            SizedBox(height: 24),
+                            SizedBox(height: _overlayH),
                           ],
                         ),
                       ),
