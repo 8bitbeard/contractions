@@ -71,7 +71,7 @@ class SummaryBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const SizedBox(width: 40),
+                  SizedBox(width: hasData ? 80 : 40),
                   Expanded(
                     child: Center(
                       child: Text(
@@ -86,6 +86,24 @@ class SummaryBar extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (hasData)
+                    IconButton(
+                      iconSize: 20,
+                      tooltip: 'Compartilhar resumo',
+                      icon: Icon(
+                        Icons.share_outlined,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                      onPressed: () {
+                        final text = _buildSummaryText(
+                          recent: recent,
+                          count: count,
+                          avgInterval: avgInterval,
+                          avgDuration: avgDuration,
+                        );
+                        SharePlus.instance.share(ShareParams(text: text));
+                      },
+                    ),
                   Consumer<ThemeProvider>(
                     builder: (_, tp, _) => IconButton(
                       iconSize: 20,
@@ -123,23 +141,6 @@ class SummaryBar extends StatelessWidget {
                         value: avgInterval != null ? formatDuration(avgInterval) : '—',
                         label: 'intervalo\nmédio',
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      tooltip: 'Copiar resumo',
-                      icon: Icon(
-                        Icons.share_outlined,
-                        color: theme.colorScheme.primary,
-                      ),
-                      onPressed: () {
-                        final text = _buildSummaryText(
-                          recent: recent,
-                          count: count,
-                          avgInterval: avgInterval,
-                          avgDuration: avgDuration,
-                        );
-                        SharePlus.instance.share(ShareParams(text: text));
-                      },
                     ),
                   ],
                 )
