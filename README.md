@@ -1,18 +1,25 @@
 # Contrações
 
-Aplicativo Android para registro e acompanhamento de contrações uterinas durante o trabalho de parto. Desenvolvido em Flutter, funciona 100% offline com armazenamento local.
+Aplicativo para registro e acompanhamento de contrações uterinas durante o trabalho de parto. Disponível para **Android e iOS**, desenvolvido em Flutter e funciona 100% offline com armazenamento local.
 
 ## Screenshots
 
+### Tela de carregamento · Tela principal · Contração em andamento
+
 <p align="center">
-  <img src="screenshots/01_tela_principal.png" width="220" alt="Tela principal"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="screenshots/02_contracao_ativa.png" width="220" alt="Contração ativa"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="screenshots/03_estatisticas.png" width="220" alt="Estatísticas"/>
+  <img src="screenshots/04_splash.png" width="200" alt="Splash screen"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/01_tela_principal.png" width="200" alt="Tela principal"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/02_contracao_ativa.png" width="200" alt="Contração ativa"/>
 </p>
+
+### Estatísticas — Calendário · Métricas e gráfico
+
 <p align="center">
-  <em>Tela principal · Contração em andamento · Estatísticas por dia</em>
+  <img src="screenshots/05_estatisticas_calendario.png" width="200" alt="Calendário de estatísticas"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/06_estatisticas_grafico.png" width="200" alt="Métricas e gráfico"/>
 </p>
 
 ## Funcionalidades
@@ -39,7 +46,7 @@ Aplicativo Android para registro e acompanhamento de contrações uterinas duran
 - Gráfico de barras com distribuição das contrações por hora do dia
 
 **Alertas**
-- Alerta automático quando as contrações estão ocorrendo com intervalos de 10 minutos ou menos por pelo menos 1 hora — sinal de trabalho de parto ativo
+- Alerta automático quando 5 ou mais contrações ocorrem com intervalos de 10 minutos ou menos na última hora — sinal de trabalho de parto ativo
 
 ## Exemplo do resumo para o obstetra
 
@@ -85,6 +92,7 @@ lib/
 ├── providers/
 │   └── contraction_provider.dart  # ChangeNotifier + timer ticker
 ├── screens/
+│   ├── splash_screen.dart    # Tela de carregamento animada
 │   └── home_screen.dart      # Tela principal com alerta de trabalho de parto
 └── widgets/
     ├── contraction_button.dart  # Botão circular animado
@@ -95,20 +103,27 @@ lib/
 
 ## Como compilar
 
-Pré-requisitos: Flutter SDK instalado e um dispositivo Android conectado ou emulador ativo.
+### Android
+
+Pré-requisitos: Flutter SDK e um dispositivo Android conectado ou emulador ativo.
 
 ```bash
-# Instalar dependências
 flutter pub get
-
-# Rodar em modo debug
-flutter run
-
-# Gerar APK de release
-flutter build apk --release
+flutter run                        # debug
+flutter build apk --release        # APK de release
 ```
 
-> As pastas `android/` e `ios/` não estão no repositório — são geradas automaticamente pelo Flutter. Para regenerá-las:
+### iOS
+
+Pré-requisitos: Flutter SDK, Xcode e um Mac. A pasta `ios/` já está versionada com todas as configurações necessárias (incluindo a tela de carregamento personalizada).
+
+```bash
+flutter pub get
+flutter run -d <device-id>         # debug no iPhone/simulador
+flutter build ios --release        # build de release
+```
+
+> **Nota:** As pastas `android/` não está versionada — é gerada automaticamente pelo Flutter. Para regenerá-la:
 > ```bash
-> flutter create --platforms android,ios .
+> flutter create --platforms android .
 > ```
