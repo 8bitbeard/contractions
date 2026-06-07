@@ -86,54 +86,54 @@ class _HomeScreenState extends State<HomeScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Contrações'),
-          centerTitle: true,
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 12),
-            Center(
-              child: ContractionButton(onContractionCompleted: _checkLaborAlert),
-            ),
-            const SizedBox(height: 10),
-            const SummaryBar(),
-            const SizedBox(height: 6),
-            TabBar(
-              tabs: const [
-                Tab(icon: Icon(Icons.list_alt_outlined), text: 'Histórico'),
-                Tab(icon: Icon(Icons.bar_chart_rounded), text: 'Estatísticas'),
-              ],
-              labelColor: theme.colorScheme.primary,
-              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-              indicatorColor: theme.colorScheme.primary,
-              dividerColor: theme.colorScheme.outlineVariant,
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: const [
-                        ContractionList(),
-                        SizedBox(height: 24),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: const [
-                        StatsSection(),
-                      ],
-                    ),
-                  ),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 12),
+              const SummaryBar(),
+              const SizedBox(height: 6),
+              TabBar(
+                tabs: const [
+                  Tab(icon: Icon(Icons.list_alt_outlined), text: 'Histórico'),
+                  Tab(icon: Icon(Icons.bar_chart_rounded), text: 'Estatísticas'),
                 ],
+                labelColor: theme.colorScheme.primary,
+                unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+                indicatorColor: theme.colorScheme.primary,
+                dividerColor: theme.colorScheme.outlineVariant,
               ),
-            ),
-          ],
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: const [
+                          ContractionList(),
+                          SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: const [
+                          StatsSection(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: ContractionButton(onContractionCompleted: _checkLaborAlert),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -65,8 +65,23 @@ class SummaryBar extends StatelessWidget {
             : theme.colorScheme.surfaceContainerHighest,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: hasData
-              ? Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Contrações',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: hasData
+                      ? theme.colorScheme.onPrimaryContainer
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (hasData)
+                Row(
                   children: [
                     Expanded(
                       child: _Metric(
@@ -113,7 +128,8 @@ class SummaryBar extends StatelessWidget {
                     ),
                   ],
                 )
-              : Row(
+              else
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.info_outline, size: 16, color: Colors.grey.shade500),
@@ -124,6 +140,8 @@ class SummaryBar extends StatelessWidget {
                     ),
                   ],
                 ),
+            ],
+          ),
         ),
       ),
     );
