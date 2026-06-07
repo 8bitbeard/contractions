@@ -124,8 +124,28 @@ class _IntervalBadge extends StatelessWidget {
 
   const _IntervalBadge({required this.interval});
 
+  List<InlineSpan> _spans(TextStyle base) {
+    final bold = base.copyWith(fontWeight: FontWeight.bold);
+    final h = interval.inHours;
+    final m = interval.inMinutes.remainder(60);
+    final s = interval.inSeconds.remainder(60);
+    final spans = <InlineSpan>[];
+    if (h > 0) {
+      spans.addAll([TextSpan(text: '$h', style: bold), TextSpan(text: 'h ', style: base)]);
+    }
+    if (m > 0) {
+      spans.addAll([TextSpan(text: '$m', style: bold), TextSpan(text: 'min ', style: base)]);
+    }
+    if (s > 0 || spans.isEmpty) {
+      spans.addAll([TextSpan(text: '$s', style: bold), TextSpan(text: 's', style: base)]);
+    }
+    spans.add(TextSpan(text: ' de intervalo', style: base));
+    return spans;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final base = TextStyle(fontSize: 14, color: Colors.grey.shade600);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Row(
@@ -136,14 +156,11 @@ class _IntervalBadge extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.arrow_downward, size: 12, color: Colors.grey.shade500),
+                Icon(Icons.arrow_downward, size: 13, color: Colors.grey.shade500),
                 const SizedBox(width: 4),
-                Text(
-                  '${formatDuration(interval)} de intervalo',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
+                RichText(text: TextSpan(children: _spans(base))),
                 const SizedBox(width: 4),
-                Icon(Icons.arrow_downward, size: 12, color: Colors.grey.shade500),
+                Icon(Icons.arrow_downward, size: 13, color: Colors.grey.shade500),
               ],
             ),
           ),

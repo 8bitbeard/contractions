@@ -78,7 +78,7 @@ class SummaryBar extends StatelessWidget {
                       child: Text(
                         'Contrações',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 26,
                           fontWeight: FontWeight.bold,
                           color: hasData
                               ? theme.colorScheme.onPrimaryContainer
@@ -183,7 +183,7 @@ class _Metric extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 20, color: theme.colorScheme.primary),
+        Icon(icon, size: 22, color: theme.colorScheme.primary),
         const SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,14 +192,14 @@ class _Metric extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 21,
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.onPrimaryContainer,
               ),
             ),
             Text(
               label,
-              style: TextStyle(fontSize: 12, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
+              style: TextStyle(fontSize: 13, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
             ),
           ],
         ),
