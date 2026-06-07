@@ -73,7 +73,7 @@ class SummaryBar extends StatelessWidget {
                 child: Text(
                   'Contrações',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: hasData
                         ? theme.colorScheme.onPrimaryContainer
@@ -138,7 +138,7 @@ class SummaryBar extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       'Nenhuma contração na última hora',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                     ),
                   ],
                 ),
@@ -171,14 +171,14 @@ class _Metric extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.onPrimaryContainer,
               ),
             ),
             Text(
               label,
-              style: TextStyle(fontSize: 11, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
+              style: TextStyle(fontSize: 12, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
             ),
           ],
         ),

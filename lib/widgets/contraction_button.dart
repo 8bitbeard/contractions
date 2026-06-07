@@ -74,7 +74,7 @@ class ContractionButton extends StatelessWidget {
                     isActive ? 'Parar' : 'Iniciar',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 19,
+                      fontSize: 21,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -62,7 +62,7 @@ class ContractionList extends StatelessWidget {
           child: Text(
             'Nenhuma contração registrada.\nPressione o botão para iniciar.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey, fontSize: 16),
+            style: TextStyle(color: Colors.grey, fontSize: 17),
           ),
         ),
       );
@@ -84,7 +84,7 @@ class ContractionList extends StatelessWidget {
                 _formatDate(day),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: 15,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
@@ -140,7 +140,7 @@ class _IntervalBadge extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${formatDuration(interval)} de intervalo',
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
                 const SizedBox(width: 4),
                 Icon(Icons.arrow_downward, size: 12, color: Colors.grey.shade500),
@@ -188,7 +188,7 @@ class _ContractionTile extends StatelessWidget {
         isActive
             ? 'Em andamento — ${formatTime(contraction.startTime)}'
             : formatTime(contraction.startTime),
-        style: const TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 15),
       ),
       subtitle: isActive
           ? null
@@ -241,7 +241,7 @@ class _ContractionSubtitle extends StatelessWidget {
       children: [
         Text(
           'Duração: ${formatDuration(duration)}',
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
         ),
         if (pain != null) ...[
           const SizedBox(width: 8),
@@ -251,7 +251,7 @@ class _ContractionSubtitle extends StatelessWidget {
             pain.label,
             style: TextStyle(
               color: pain.color,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
           ),

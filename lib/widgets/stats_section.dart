@@ -177,11 +177,11 @@ class _StatCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
                   const SizedBox(height: 2),
                   Text(
                     value,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
