@@ -71,7 +71,19 @@ class SummaryBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  SizedBox(width: hasData ? 80 : 40),
+                  Consumer<ThemeProvider>(
+                    builder: (_, tp, _) => IconButton(
+                      iconSize: 20,
+                      tooltip: tp.isDark ? 'Tema claro' : 'Tema escuro',
+                      icon: Icon(
+                        tp.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                      ),
+                      color: hasData
+                          ? theme.colorScheme.onPrimaryContainer
+                          : theme.colorScheme.onSurfaceVariant,
+                      onPressed: tp.toggle,
+                    ),
+                  ),
                   Expanded(
                     child: Center(
                       child: Text(
@@ -103,20 +115,9 @@ class SummaryBar extends StatelessWidget {
                         );
                         SharePlus.instance.share(ShareParams(text: text));
                       },
-                    ),
-                  Consumer<ThemeProvider>(
-                    builder: (_, tp, _) => IconButton(
-                      iconSize: 20,
-                      tooltip: tp.isDark ? 'Tema claro' : 'Tema escuro',
-                      icon: Icon(
-                        tp.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                      ),
-                      color: hasData
-                          ? theme.colorScheme.onPrimaryContainer
-                          : theme.colorScheme.onSurfaceVariant,
-                      onPressed: tp.toggle,
-                    ),
-                  ),
+                    )
+                  else
+                    const SizedBox(width: 40),
                 ],
               ),
               const SizedBox(height: 10),
