@@ -239,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   // Botão de scroll ao topo (só no histórico, fora do topo).
                   Positioned(
                     right: 16,
-                    bottom: _overlayH + 8,
+                    bottom: _overlayH - 60,
                     child: AnimatedOpacity(
                       opacity: (_showScrollTop && _showButton) ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 220),
