@@ -57,7 +57,7 @@ class SummaryBar extends StatelessWidget {
                       child: _Metric(
                         icon: Icons.favorite_rounded,
                         value: '$count',
-                        label: 'contração${count == 1 ? '' : 'ões'}\nna última hora',
+                        label: '${count == 1 ? 'contração' : 'contrações'}\nna última hora',
                       ),
                     ),
                     VerticalDivider(
