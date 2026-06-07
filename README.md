@@ -63,12 +63,14 @@ Intervalo médio: 8min 30s
 Duração média: 47s
 
 Detalhes:
-1. 06/06/2026 13:45 — 52s
-2. 06/06/2026 13:54 — 45s
-3. 06/06/2026 14:03 — 48s
+1. 06/06/2026 13:45 — 52s — Dor leve
+2. 06/06/2026 13:54 — 45s — Sem dor
+3. 06/06/2026 14:03 — 48s — Dor moderada
 4. 06/06/2026 14:12 — 44s
 5. 06/06/2026 14:21 — em andamento
 ```
+
+O nível de dor aparece ao lado da duração quando selecionado. Contrações sem nível registrado exibem apenas o horário e a duração.
 
 ## Stack
 
