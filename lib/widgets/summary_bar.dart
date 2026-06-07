@@ -175,7 +175,7 @@ class _Metric extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 22, color: theme.colorScheme.primary),
+        Icon(icon, size: 20, color: theme.colorScheme.primary),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -185,7 +185,7 @@ class _Metric extends StatelessWidget {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 21,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.onPrimaryContainer,
                 ),
@@ -193,7 +193,7 @@ class _Metric extends StatelessWidget {
               ),
               Text(
                 label,
-                style: TextStyle(fontSize: 13, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
                 overflow: TextOverflow.ellipsis,
               ),
             ],
