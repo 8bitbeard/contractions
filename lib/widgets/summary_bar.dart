@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../models/contraction.dart';
 import '../providers/contraction_provider.dart';
 
 class SummaryBar extends StatelessWidget {
@@ -10,6 +13,33 @@ class SummaryBar extends StatelessWidget {
     if (d.inMinutes == 0) return '${s}s';
     if (s == 0) return '${d.inMinutes}min';
     return '${d.inMinutes}min ${s}s';
+  }
+
+  static String _buildSummaryText({
+    required List<Contraction> recent,
+    required int count,
+    required Duration? avgInterval,
+    required Duration? avgDuration,
+  }) {
+    final now = DateTime.now();
+    final dtFmt = DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
+    final timeFmt = DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
+
+    final buf = StringBuffer();
+    buf.writeln('Contrações — resumo da última hora');
+    buf.writeln('Gerado em ${dtFmt.format(now)}');
+    buf.writeln();
+    buf.writeln('Total: $count ${count == 1 ? 'contração' : 'contrações'}');
+    buf.writeln('Intervalo médio: ${avgInterval != null ? _fmt(avgInterval) : '—'}');
+    buf.writeln('Duração média: ${avgDuration != null ? _fmt(avgDuration) : '—'}');
+    buf.writeln();
+    buf.writeln('Detalhes:');
+    for (int i = 0; i < recent.length; i++) {
+      final c = recent[i];
+      final dur = c.duration != null ? _fmt(c.duration!) : 'em andamento';
+      buf.writeln('${i + 1}. ${timeFmt.format(c.startTime)} — $dur');
+    }
+    return buf.toString().trimRight();
   }
 
   @override
@@ -25,6 +55,7 @@ class SummaryBar extends StatelessWidget {
     final count = recent.length;
 
     final completed = recent.where((c) => !c.isActive).toList();
+
     Duration? avgInterval;
     if (completed.length >= 2) {
       final gaps = <Duration>[];
@@ -36,6 +67,15 @@ class SummaryBar extends StatelessWidget {
         final total = gaps.fold<Duration>(Duration.zero, (s, d) => s + d);
         avgInterval = Duration(microseconds: total.inMicroseconds ~/ gaps.length);
       }
+    }
+
+    Duration? avgDuration;
+    if (completed.isNotEmpty) {
+      final total = completed.fold<Duration>(
+        Duration.zero,
+        (s, c) => s + c.duration!,
+      );
+      avgDuration = Duration(microseconds: total.inMicroseconds ~/ completed.length);
     }
 
     final theme = Theme.of(context);
@@ -71,6 +111,32 @@ class SummaryBar extends StatelessWidget {
                         value: avgInterval != null ? _fmt(avgInterval) : '—',
                         label: 'intervalo\nmédio',
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      tooltip: 'Copiar resumo',
+                      icon: Icon(
+                        Icons.share_outlined,
+                        color: theme.colorScheme.primary,
+                      ),
+                      onPressed: () async {
+                        final text = _buildSummaryText(
+                          recent: recent,
+                          count: count,
+                          avgInterval: avgInterval,
+                          avgDuration: avgDuration,
+                        );
+                        await Clipboard.setData(ClipboardData(text: text));
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Resumo copiado — é só colar no WhatsApp!'),
+                              behavior: SnackBarBehavior.floating,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ],
                 )
