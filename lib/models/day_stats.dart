@@ -45,11 +45,11 @@ class DayStats {
       ? null
       : completed.fold<Duration>(Duration.zero, (s, c) => s + c.duration!);
 
-  /// 12 slots de 2h cada (índice 0 = 00h–02h, ..., 11 = 22h–24h)
+  /// 24 slots de 1h cada (índice 0 = 00h–01h, ..., 23 = 23h–00h)
   List<int> get contractionsBySlot {
-    final slots = List.filled(12, 0);
+    final slots = List.filled(24, 0);
     for (final c in all) {
-      slots[c.startTime.hour ~/ 2]++;
+      slots[c.startTime.hour]++;
     }
     return slots;
   }

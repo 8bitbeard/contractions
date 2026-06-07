@@ -229,7 +229,7 @@ class _ContractionChartState extends State<_ContractionChart> {
     final slots = widget.stats.contractionsBySlot;
     final maxY = slots.fold(0, (m, v) => v > m ? v : m).toDouble();
 
-    final groups = List.generate(12, (i) {
+    final groups = List.generate(24, (i) {
       final isTouched = _touchedIndex == i;
       return BarChartGroupData(
         x: i,
@@ -241,8 +241,8 @@ class _ContractionChartState extends State<_ContractionChart> {
                 : isTouched
                     ? widget.theme.colorScheme.error
                     : widget.theme.colorScheme.primary,
-            width: 16,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+            width: 9,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
           ),
         ],
       );
@@ -273,8 +273,8 @@ class _ContractionChartState extends State<_ContractionChart> {
             getTooltipColor: (_) => Colors.black87,
             tooltipRoundedRadius: 8,
             getTooltipItem: (group, _, rod, _) {
-              final start = (group.x * 2).toString().padLeft(2, '0');
-              final end = ((group.x * 2) + 2).toString().padLeft(2, '0');
+              final start = group.x.toString().padLeft(2, '0');
+              final end = ((group.x + 1) % 24).toString().padLeft(2, '0');
               final count = rod.toY.toInt();
               return BarTooltipItem(
                 '${start}h – ${end}h\n',
@@ -317,11 +317,12 @@ class _ContractionChartState extends State<_ContractionChart> {
               showTitles: true,
               reservedSize: 22,
               getTitlesWidget: (value, _) {
-                final hour = (value.toInt() * 2).toString().padLeft(2, '0');
+                final h = value.toInt();
+                if (h % 4 != 0) return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    '${hour}h',
+                    '${h.toString().padLeft(2, '0')}h',
                     style: const TextStyle(fontSize: 9, color: Colors.grey),
                   ),
                 );
