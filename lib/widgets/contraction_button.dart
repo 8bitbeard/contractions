@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/contraction_provider.dart';
+import 'pain_level_sheet.dart';
 
 class ContractionButton extends StatelessWidget {
   const ContractionButton({super.key});
@@ -9,6 +10,17 @@ class ContractionButton extends StatelessWidget {
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$m:$s';
+  }
+
+  Future<void> _onTap(BuildContext context, ContractionProvider provider) async {
+    if (provider.isActive) {
+      final closed = await provider.stopContraction();
+      if (context.mounted) {
+        await showPainLevelSheet(context, closed, provider);
+      }
+    } else {
+      await provider.toggleContraction();
+    }
   }
 
   @override
@@ -21,7 +33,7 @@ class ContractionButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
-          onTap: provider.toggleContraction,
+          onTap: () => _onTap(context, provider),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: 140,

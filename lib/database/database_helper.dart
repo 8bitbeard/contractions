@@ -18,15 +18,21 @@ class DatabaseHelper {
     final path = join(dbPath, 'contractions.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE contractions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             start_time INTEGER NOT NULL,
-            end_time INTEGER
+            end_time INTEGER,
+            pain_level INTEGER
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE contractions ADD COLUMN pain_level INTEGER');
+        }
       },
     );
   }

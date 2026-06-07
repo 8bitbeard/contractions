@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/contraction.dart';
 import '../providers/contraction_provider.dart';
+import '../utils/app_toast.dart';
 
 class SummaryBar extends StatelessWidget {
   const SummaryBar({super.key});
@@ -37,7 +38,8 @@ class SummaryBar extends StatelessWidget {
     for (int i = 0; i < recent.length; i++) {
       final c = recent[i];
       final dur = c.duration != null ? _fmt(c.duration!) : 'em andamento';
-      buf.writeln('${i + 1}. ${timeFmt.format(c.startTime)} — $dur');
+      final pain = c.painLevel != null ? ' — ${c.painLevel!.label}' : '';
+      buf.writeln('${i + 1}. ${timeFmt.format(c.startTime)} — $dur$pain');
     }
     return buf.toString().trimRight();
   }
@@ -128,12 +130,10 @@ class SummaryBar extends StatelessWidget {
                         );
                         await Clipboard.setData(ClipboardData(text: text));
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('Resumo copiado — é só colar no WhatsApp!'),
-                              behavior: SnackBarBehavior.floating,
-                              duration: const Duration(seconds: 2),
-                            ),
+                          AppToast.show(
+                            context,
+                            message: 'Resumo copiado — é só colar no WhatsApp!',
+                            icon: Icons.share_rounded,
                           );
                         }
                       },

@@ -49,7 +49,7 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (_activeContraction == null) {
       await _startContraction();
     } else {
-      await _endContraction();
+      await stopContraction();
     }
   }
 
@@ -62,7 +62,7 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  Future<void> _endContraction() async {
+  Future<Contraction> stopContraction() async {
     _ticker?.cancel();
     final closed = _activeContraction!.copyWith(endTime: DateTime.now());
     await DatabaseHelper.instance.update(closed);
@@ -71,6 +71,7 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
     _activeContraction = null;
     _elapsed = Duration.zero;
     notifyListeners();
+    return closed;
   }
 
   void _startTicker() {
