@@ -8,11 +8,13 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
   Contraction? _activeContraction;
   Timer? _ticker;
   Duration _elapsed = Duration.zero;
+  bool _isLoaded = false;
 
   List<Contraction> get contractions => _contractions;
   Contraction? get activeContraction => _activeContraction;
   Duration get elapsed => _elapsed;
   bool get isActive => _activeContraction != null;
+  bool get isLoaded => _isLoaded;
 
   Map<DateTime, List<Contraction>> get groupedByDay {
     final map = <DateTime, List<Contraction>>{};
@@ -31,6 +33,7 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
       _activeContraction = open.first;
       _startTicker();
     }
+    _isLoaded = true;
     notifyListeners();
   }
 
