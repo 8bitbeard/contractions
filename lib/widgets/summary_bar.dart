@@ -185,23 +185,27 @@ class _Metric extends StatelessWidget {
       children: [
         Icon(icon, size: 22, color: theme.colorScheme.primary),
         const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onPrimaryContainer,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            Text(
-              label,
-              style: TextStyle(fontSize: 13, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
-            ),
-          ],
+              Text(
+                label,
+                style: TextStyle(fontSize: 13, color: theme.colorScheme.onPrimaryContainer.withAlpha(180)),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ],
     );
