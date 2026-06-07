@@ -17,7 +17,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   bool _alertShown = false;
   late final TabController _tabController;
+  late final ScrollController _historyScrollController;
   bool _showButton = true;
+  bool _showScrollTop = false;
+
+  // Altura do centro do botão a partir do rodapé (raio + padding inferior).
+  static const double _buttonRadius = 75;
+  static const double _buttonBottomPad = 6;
+  static const double _buttonCenter = _buttonRadius + _buttonBottomPad; // 81px
 
   @override
   void initState() {
@@ -27,11 +34,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       final onHistorico = _tabController.index == 0;
       if (_showButton != onHistorico) setState(() => _showButton = onHistorico);
     });
+    _historyScrollController = ScrollController();
+    _historyScrollController.addListener(() {
+      final show = _historyScrollController.offset > 80;
+      if (_showScrollTop != show) setState(() => _showScrollTop = show);
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _historyScrollController.dispose();
     super.dispose();
   }
 
@@ -125,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     controller: _tabController,
                     children: [
                       SingleChildScrollView(
+                        controller: _historyScrollController,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: const [
@@ -143,6 +157,35 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ],
                   ),
+
+                  // Gradiente: transparente no topo → sólido no centro do botão.
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: _buttonCenter,
+                    height: 210,
+                    child: AnimatedOpacity(
+                      opacity: _showButton ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeInOut,
+                      child: IgnorePointer(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                theme.colorScheme.surface.withAlpha(0),
+                                theme.colorScheme.surface,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Área sólida + botão (do centro do botão para baixo).
                   Positioned(
                     left: 0,
                     right: 0,
@@ -153,34 +196,40 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       curve: Curves.easeInOut,
                       child: IgnorePointer(
                         ignoring: !_showButton,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IgnorePointer(
-                              child: Container(
-                                height: 220,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      theme.colorScheme.surface.withAlpha(0),
-                                      theme.colorScheme.surface.withAlpha(230),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                        child: Container(
+                          color: theme.colorScheme.surface,
+                          padding: const EdgeInsets.only(
+                            top: 4,
+                            bottom: _buttonBottomPad,
+                          ),
+                          child: Center(
+                            child: ContractionButton(
+                              onContractionCompleted: _checkLaborAlert,
                             ),
-                            Container(
-                              color: theme.colorScheme.surface.withAlpha(230),
-                              padding: const EdgeInsets.only(top: 4, bottom: 6),
-                              child: Center(
-                                child: ContractionButton(
-                                  onContractionCompleted: _checkLaborAlert,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Botão de scroll ao topo (só no histórico, fora do topo).
+                  Positioned(
+                    right: 16,
+                    bottom: _buttonCenter + 210 + 12,
+                    child: AnimatedOpacity(
+                      opacity: (_showScrollTop && _showButton) ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 220),
+                      child: IgnorePointer(
+                        ignoring: !(_showScrollTop && _showButton),
+                        child: FloatingActionButton.small(
+                          heroTag: 'scrollTop',
+                          tooltip: 'Voltar ao topo',
+                          onPressed: () => _historyScrollController.animateTo(
+                            0,
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeInOut,
+                          ),
+                          child: const Icon(Icons.keyboard_arrow_up_rounded),
                         ),
                       ),
                     ),
