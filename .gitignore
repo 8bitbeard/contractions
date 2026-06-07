@@ -39,6 +39,14 @@ app.*.symbols
 # Obfuscation
 app.*.map.json
 
-# Android / iOS — gerados pelo Flutter, não versionados
+# Android — gerado pelo Flutter, não versionado
 /android/
-/ios/
+
+# iOS — versionado, mas excluindo artefatos de build
+/ios/build/
+/ios/Pods/
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/ephemeral/
+/ios/.dart_tool/
+/ios/**/*.xcuserstate
+/ios/**/xcuserdata/
