@@ -90,7 +90,7 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
         .toList()
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
-    if (recent.length <= 5) return false;
+    if (recent.length < 5) return false;
 
     bool hasInterval = false;
     for (int i = 1; i < recent.length; i++) {
