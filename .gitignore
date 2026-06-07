@@ -39,12 +39,6 @@ app.*.symbols
 # Obfuscation
 app.*.map.json
 
-# Android Studio build artifacts
-/android/app/debug
-/android/app/profile
-/android/app/release
-/android/build/
-/android/app/build/
-
-# iOS build artifacts
-/ios/build/
+# Android / iOS — gerados pelo Flutter, não versionados
+/android/
+/ios/
