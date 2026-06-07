@@ -4,19 +4,21 @@ Aplicativo para registro e acompanhamento de contrações uterinas durante o tra
 
 ## Screenshots
 
-### Tela de carregamento · Tela principal · Contração em andamento
+### Tela de carregamento · Histórico com níveis de dor · Contração em andamento
 
 <p align="center">
   <img src="screenshots/04_splash.png" width="200" alt="Splash screen"/>
   &nbsp;&nbsp;
-  <img src="screenshots/01_tela_principal.png" width="200" alt="Tela principal"/>
+  <img src="screenshots/01_tela_principal.png" width="200" alt="Histórico com níveis de dor"/>
   &nbsp;&nbsp;
   <img src="screenshots/02_contracao_ativa.png" width="200" alt="Contração ativa"/>
 </p>
 
-### Estatísticas — Calendário · Métricas e gráfico
+### Seleção de nível de dor · Estatísticas — Calendário · Métricas e gráfico
 
 <p align="center">
+  <img src="screenshots/07_nivel_de_dor_sheet.png" width="200" alt="Seleção de nível de dor"/>
+  &nbsp;&nbsp;
   <img src="screenshots/05_estatisticas_calendario.png" width="200" alt="Calendário de estatísticas"/>
   &nbsp;&nbsp;
   <img src="screenshots/06_estatisticas_grafico.png" width="200" alt="Métricas e gráfico"/>
