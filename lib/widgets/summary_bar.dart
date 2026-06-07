@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/contraction.dart';
 import '../models/day_stats.dart';
 import '../providers/contraction_provider.dart';
 import '../providers/theme_provider.dart';
-import '../utils/app_toast.dart';
 import '../utils/format_utils.dart';
 
 class SummaryBar extends StatelessWidget {
@@ -132,21 +131,14 @@ class SummaryBar extends StatelessWidget {
                         Icons.share_outlined,
                         color: theme.colorScheme.primary,
                       ),
-                      onPressed: () async {
+                      onPressed: () {
                         final text = _buildSummaryText(
                           recent: recent,
                           count: count,
                           avgInterval: avgInterval,
                           avgDuration: avgDuration,
                         );
-                        await Clipboard.setData(ClipboardData(text: text));
-                        if (context.mounted) {
-                          AppToast.show(
-                            context,
-                            message: 'Resumo copiado — é só colar no WhatsApp!',
-                            icon: Icons.share_rounded,
-                          );
-                        }
+                        SharePlus.instance.share(ShareParams(text: text));
                       },
                     ),
                   ],
