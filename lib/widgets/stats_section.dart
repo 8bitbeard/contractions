@@ -32,17 +32,6 @@ class _StatsSectionState extends State<StatsSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Text(
-            'Estatísticas',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-        ),
         Card(
           margin: const EdgeInsets.symmetric(horizontal: 12),
           child: TableCalendar(

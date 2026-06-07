@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 28, bottom: 24),
+                padding: const EdgeInsets.only(top: 36, bottom: 24),
                 child: Center(
                   child: ContractionButton(onContractionCompleted: _checkLaborAlert),
                 ),

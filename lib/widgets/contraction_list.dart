@@ -9,7 +9,7 @@ import '../utils/format_utils.dart';
 class ContractionList extends StatelessWidget {
   const ContractionList({super.key});
 
-  String _formatTime(DateTime dt) => DateFormat('HH:mm:ss').format(dt);
+  String _formatTime(DateTime dt) => DateFormat('HH:mm').format(dt);
 
   String _formatDate(DateTime dt) => DateFormat('EEEE, d MMMM y', 'pt_BR').format(dt);
 
@@ -187,7 +187,7 @@ class _ContractionTile extends StatelessWidget {
       title: Text(
         isActive
             ? 'Em andamento — ${formatTime(contraction.startTime)}'
-            : '${formatTime(contraction.startTime)} → ${formatTime(contraction.endTime!)}',
+            : formatTime(contraction.startTime),
         style: const TextStyle(fontSize: 14),
       ),
       subtitle: isActive
@@ -241,7 +241,7 @@ class _ContractionSubtitle extends StatelessWidget {
       children: [
         Text(
           'Duração: ${formatDuration(duration)}',
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
         ),
         if (pain != null) ...[
           const SizedBox(width: 8),
