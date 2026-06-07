@@ -15,7 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  ContractionProvider? _provider;
   bool _alertShown = false;
 
   @override
@@ -24,37 +23,19 @@ class _HomeScreenState extends State<HomeScreen> {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final provider = context.read<ContractionProvider>();
-    if (_provider != provider) {
-      _provider?.removeListener(_onUpdate);
-      _provider = provider;
-      _provider!.addListener(_onUpdate);
-    }
-  }
-
-  @override
-  void dispose() {
-    _provider?.removeListener(_onUpdate);
-    super.dispose();
-  }
-
-  void _onUpdate() {
+  void _checkLaborAlert() {
     if (!mounted) return;
-    final shouldAlert = _provider!.shouldShowLaborAlert;
+    final provider = context.read<ContractionProvider>();
+    final shouldAlert = provider.shouldShowLaborAlert;
 
     if (!shouldAlert) {
-      if (_alertShown) setState(() => _alertShown = false);
+      _alertShown = false;
       return;
     }
 
     if (!_alertShown) {
-      setState(() => _alertShown = true);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _showLaborAlert();
-      });
+      _alertShown = true;
+      _showLaborAlert();
     }
   }
 
@@ -92,7 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-    );
+    ).then((_) {
+      // Permite exibir novamente se o alerta for dispensado e a condição persistir
+      _alertShown = false;
+    });
   }
 
   @override
@@ -110,7 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 12),
-            const Center(child: ContractionButton()),
+            Center(
+              child: ContractionButton(onContractionCompleted: _checkLaborAlert),
+            ),
             const SizedBox(height: 10),
             const SummaryBar(),
             const SizedBox(height: 6),

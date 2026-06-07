@@ -4,7 +4,9 @@ import '../providers/contraction_provider.dart';
 import 'pain_level_sheet.dart';
 
 class ContractionButton extends StatelessWidget {
-  const ContractionButton({super.key});
+  final VoidCallback? onContractionCompleted;
+
+  const ContractionButton({super.key, this.onContractionCompleted});
 
   String _formatDuration(Duration d) {
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -17,6 +19,10 @@ class ContractionButton extends StatelessWidget {
       final closed = await provider.stopContraction();
       if (context.mounted) {
         await showPainLevelSheet(context, closed, provider);
+      }
+      // Só verifica o alerta depois que o fluxo completo terminou
+      if (context.mounted) {
+        onContractionCompleted?.call();
       }
     } else {
       await provider.startContraction();
