@@ -42,8 +42,8 @@ class ContractionButton extends StatelessWidget {
           onTap: () => _onTap(context, provider),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: 140,
-            height: 140,
+            width: 168,
+            height: 168,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isActive
@@ -67,14 +67,14 @@ class ContractionButton extends StatelessWidget {
                   Icon(
                     isActive ? Icons.stop : Icons.fiber_manual_record,
                     color: Colors.white,
-                    size: 36,
+                    size: 44,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     isActive ? 'Parar' : 'Iniciar',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
+                      fontSize: 19,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -104,30 +104,54 @@ class _HomeScreenState extends State<HomeScreen> {
                 dividerColor: theme.colorScheme.outlineVariant,
               ),
               Expanded(
-                child: TabBarView(
+                child: Stack(
                   children: [
-                    SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: const [
-                          ContractionList(),
-                          SizedBox(height: 24),
-                        ],
-                      ),
+                    TabBarView(
+                      children: [
+                        SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: const [
+                              ContractionList(),
+                              SizedBox(height: 24),
+                            ],
+                          ),
+                        ),
+                        SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: const [
+                              StatsSection(),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: const [
-                          StatsSection(),
-                        ],
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: IgnorePointer(
+                        child: Container(
+                          height: 72,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                theme.colorScheme.surface.withAlpha(0),
+                                theme.colorScheme.surface,
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.only(top: 28, bottom: 24),
                 child: Center(
                   child: ContractionButton(onContractionCompleted: _checkLaborAlert),
                 ),
