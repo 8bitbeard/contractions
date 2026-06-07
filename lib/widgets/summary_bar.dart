@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/contraction.dart';
 import '../models/day_stats.dart';
 import '../providers/contraction_provider.dart';
+import '../providers/theme_provider.dart';
 import '../utils/app_toast.dart';
 import '../utils/format_utils.dart';
 
@@ -69,17 +70,37 @@ class SummaryBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Center(
-                child: Text(
-                  'Contrações',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: hasData
-                        ? theme.colorScheme.onPrimaryContainer
-                        : theme.colorScheme.onSurface,
+              Row(
+                children: [
+                  const SizedBox(width: 40),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Contrações',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: hasData
+                              ? theme.colorScheme.onPrimaryContainer
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  Consumer<ThemeProvider>(
+                    builder: (_, tp, _) => IconButton(
+                      iconSize: 20,
+                      tooltip: tp.isDark ? 'Tema claro' : 'Tema escuro',
+                      icon: Icon(
+                        tp.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                      ),
+                      color: hasData
+                          ? theme.colorScheme.onPrimaryContainer
+                          : theme.colorScheme.onSurfaceVariant,
+                      onPressed: tp.toggle,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               if (hasData)
