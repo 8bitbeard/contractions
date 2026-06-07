@@ -10,6 +10,8 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
   Duration _elapsed = Duration.zero;
   bool _isLoaded = false;
 
+  Map<DateTime, List<Contraction>>? _groupedByDayCache;
+
   List<Contraction> get contractions => _contractions;
   Contraction? get activeContraction => _activeContraction;
   Duration get elapsed => _elapsed;
@@ -17,6 +19,10 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
   bool get isLoaded => _isLoaded;
 
   Map<DateTime, List<Contraction>> get groupedByDay {
+    return _groupedByDayCache ??= _buildGroupedByDay();
+  }
+
+  Map<DateTime, List<Contraction>> _buildGroupedByDay() {
     final map = <DateTime, List<Contraction>>{};
     for (final c in _contractions) {
       final day = DateTime(c.startTime.year, c.startTime.month, c.startTime.day);
@@ -25,9 +31,12 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
     return map;
   }
 
+  void _invalidateCache() => _groupedByDayCache = null;
+
   Future<void> load() async {
     WidgetsBinding.instance.addObserver(this);
     _contractions = await DatabaseHelper.instance.getAll();
+    _invalidateCache();
     final open = _contractions.where((c) => c.isActive).toList();
     if (open.isNotEmpty) {
       _activeContraction = open.first;
@@ -47,16 +56,17 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> toggleContraction() async {
     if (_activeContraction == null) {
-      await _startContraction();
+      await startContraction();
     } else {
       await stopContraction();
     }
   }
 
-  Future<void> _startContraction() async {
+  Future<void> startContraction() async {
     final c = Contraction(startTime: DateTime.now());
     _activeContraction = await DatabaseHelper.instance.insert(c);
     _contractions.insert(0, _activeContraction!);
+    _invalidateCache();
     _elapsed = Duration.zero;
     _startTicker();
     notifyListeners();
@@ -67,7 +77,10 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
     final closed = _activeContraction!.copyWith(endTime: DateTime.now());
     await DatabaseHelper.instance.update(closed);
     final idx = _contractions.indexWhere((c) => c.id == closed.id);
-    if (idx != -1) _contractions[idx] = closed;
+    if (idx != -1) {
+      _contractions[idx] = closed;
+      _invalidateCache();
+    }
     _activeContraction = null;
     _elapsed = Duration.zero;
     notifyListeners();
@@ -108,13 +121,17 @@ class ContractionProvider extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> updateContraction(Contraction updated) async {
     await DatabaseHelper.instance.update(updated);
     final idx = _contractions.indexWhere((c) => c.id == updated.id);
-    if (idx != -1) _contractions[idx] = updated;
+    if (idx != -1) {
+      _contractions[idx] = updated;
+      _invalidateCache();
+    }
     notifyListeners();
   }
 
   Future<void> delete(int id) async {
     await DatabaseHelper.instance.delete(id);
     _contractions.removeWhere((c) => c.id == id);
+    _invalidateCache();
     notifyListeners();
   }
 

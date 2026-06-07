@@ -19,7 +19,7 @@ class ContractionButton extends StatelessWidget {
         await showPainLevelSheet(context, closed, provider);
       }
     } else {
-      await provider.toggleContraction();
+      await provider.startContraction();
     }
   }
 

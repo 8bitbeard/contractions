@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/contraction.dart';
 import '../providers/contraction_provider.dart';
+import '../utils/format_utils.dart';
 
 class ContractionList extends StatelessWidget {
   const ContractionList({super.key});
@@ -11,13 +12,6 @@ class ContractionList extends StatelessWidget {
   String _formatTime(DateTime dt) => DateFormat('HH:mm:ss').format(dt);
 
   String _formatDate(DateTime dt) => DateFormat('EEEE, d MMMM y', 'pt_BR').format(dt);
-
-  static String formatDuration(Duration d) {
-    final s = d.inSeconds.remainder(60);
-    if (d.inMinutes == 0) return '${s}s';
-    if (s == 0) return '${d.inMinutes}min';
-    return '${d.inMinutes}min ${s}s';
-  }
 
   Future<void> _showEditDialog(BuildContext context, Contraction c, ContractionProvider provider) async {
     final newDuration = await showDialog<Duration>(
@@ -145,7 +139,7 @@ class _IntervalBadge extends StatelessWidget {
                 Icon(Icons.arrow_downward, size: 12, color: Colors.grey.shade500),
                 const SizedBox(width: 4),
                 Text(
-                  '${ContractionList.formatDuration(interval)} de intervalo',
+                  '${formatDuration(interval)} de intervalo',
                   style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                 ),
                 const SizedBox(width: 4),
@@ -240,37 +234,23 @@ class _ContractionSubtitle extends StatelessWidget {
 
   const _ContractionSubtitle({required this.contraction, required this.duration});
 
-  static const _painIcons = {
-    PainLevel.none: Icons.sentiment_very_satisfied_rounded,
-    PainLevel.mild: Icons.sentiment_satisfied_rounded,
-    PainLevel.moderate: Icons.sentiment_dissatisfied_rounded,
-    PainLevel.strong: Icons.sentiment_very_dissatisfied_rounded,
-  };
-
-  static const _painColors = {
-    PainLevel.none: Color(0xFF4CAF50),
-    PainLevel.mild: Color(0xFFFFC107),
-    PainLevel.moderate: Color(0xFFFF9800),
-    PainLevel.strong: Color(0xFFF44336),
-  };
-
   @override
   Widget build(BuildContext context) {
     final pain = contraction.painLevel;
     return Row(
       children: [
         Text(
-          'Duração: ${ContractionList.formatDuration(duration)}',
+          'Duração: ${formatDuration(duration)}',
           style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
         ),
         if (pain != null) ...[
           const SizedBox(width: 8),
-          Icon(_painIcons[pain]!, color: _painColors[pain]!, size: 14),
+          Icon(pain.icon, color: pain.color, size: 14),
           const SizedBox(width: 3),
           Text(
             pain.label,
             style: TextStyle(
-              color: _painColors[pain]!,
+              color: pain.color,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),

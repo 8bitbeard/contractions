@@ -18,6 +18,9 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _fadeAnim;
   bool _navigationScheduled = false;
 
+  ContractionProvider? _provider;
+  void Function()? _loadListener;
+
   @override
   void initState() {
     super.initState();
@@ -39,19 +42,21 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _scheduleNavigation() {
-    final provider = context.read<ContractionProvider>();
+    _provider = context.read<ContractionProvider>();
     final minDelay = Future.delayed(const Duration(milliseconds: 1800));
 
     Future<void> waitForLoad() async {
-      if (provider.isLoaded) return;
+      if (_provider!.isLoaded) return;
       final completer = Completer<void>();
       void listener() {
-        if (provider.isLoaded) {
-          provider.removeListener(listener);
+        if (_provider!.isLoaded) {
+          _provider!.removeListener(listener);
+          _loadListener = null;
           completer.complete();
         }
       }
-      provider.addListener(listener);
+      _loadListener = listener;
+      _provider!.addListener(listener);
       return completer.future;
     }
 
@@ -70,6 +75,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
+    if (_loadListener != null) {
+      _provider?.removeListener(_loadListener!);
+    }
     _ctrl.dispose();
     super.dispose();
   }
@@ -86,7 +94,6 @@ class _SplashScreenState extends State<SplashScreen>
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Ícone grande e semi-transparente como fundo
             Positioned(
               child: Image.asset(
                 'assets/icon/icon.png',
@@ -96,7 +103,6 @@ class _SplashScreenState extends State<SplashScreen>
                 fit: BoxFit.contain,
               ),
             ),
-            // Nome do aplicativo centralizado
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [

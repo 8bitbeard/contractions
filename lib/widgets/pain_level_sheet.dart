@@ -96,25 +96,9 @@ class _PainOption extends StatelessWidget {
 
   const _PainOption({required this.level, required this.onTap});
 
-  static const _icons = {
-    PainLevel.none: Icons.sentiment_very_satisfied_rounded,
-    PainLevel.mild: Icons.sentiment_satisfied_rounded,
-    PainLevel.moderate: Icons.sentiment_dissatisfied_rounded,
-    PainLevel.strong: Icons.sentiment_very_dissatisfied_rounded,
-  };
-
-  static const _colors = {
-    PainLevel.none: Color(0xFF4CAF50),
-    PainLevel.mild: Color(0xFFFFC107),
-    PainLevel.moderate: Color(0xFFFF9800),
-    PainLevel.strong: Color(0xFFF44336),
-  };
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final icon = _icons[level]!;
-    final color = _colors[level]!;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -124,13 +108,13 @@ class _PainOption extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: color.withAlpha(20),
+            color: level.color.withAlpha(20),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withAlpha(60), width: 1.5),
+            border: Border.all(color: level.color.withAlpha(60), width: 1.5),
           ),
           child: Row(
             children: [
-              Icon(icon, color: color, size: 28),
+              Icon(level.icon, color: level.color, size: 28),
               const SizedBox(width: 14),
               Text(
                 level.label,

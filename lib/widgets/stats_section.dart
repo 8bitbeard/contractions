@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/day_stats.dart';
 import '../providers/contraction_provider.dart';
+import '../utils/format_utils.dart';
 
 class StatsSection extends StatefulWidget {
   const StatsSection({super.key});
@@ -17,14 +18,6 @@ class _StatsSectionState extends State<StatsSection> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
-  static String formatDuration(Duration d) {
-    final totalMinutes = d.inMinutes;
-    final s = d.inSeconds.remainder(60);
-    if (totalMinutes == 0) return '${s}s';
-    if (s == 0) return '${totalMinutes}min';
-    return '${totalMinutes}min ${s}s';
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ContractionProvider>();
@@ -33,6 +26,8 @@ class _StatsSectionState extends State<StatsSection> {
     final dayContractions = grouped[key] ?? [];
     final stats = DayStats(dayContractions);
     final theme = Theme.of(context);
+
+    final now = DateTime.now();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,8 +47,8 @@ class _StatsSectionState extends State<StatsSection> {
           margin: const EdgeInsets.symmetric(horizontal: 12),
           child: TableCalendar(
             locale: 'pt_BR',
-            firstDay: DateTime(2020),
-            lastDay: DateTime(2030),
+            firstDay: DateTime(now.year - 5),
+            lastDay: DateTime(now.year + 5),
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             calendarFormat: CalendarFormat.month,
@@ -124,7 +119,7 @@ class _StatsSectionState extends State<StatsSection> {
             height: 200,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 16, 0),
-              child: _ContractionChart(stats: stats, theme: theme),
+              child: _ContractionChart(stats: stats),
             ),
           ),
         ],
@@ -142,15 +137,14 @@ class _StatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = stats;
-    final fmt = _StatsSectionState.formatDuration;
 
     final items = [
-      (Icons.favorite_rounded, 'Contrações', '${s.count}', false),
-      (Icons.timer_outlined, 'Duração média', s.averageDuration != null ? fmt(s.averageDuration!) : '—', false),
-      (Icons.swap_horiz_rounded, 'Intervalo médio', s.averageInterval != null ? fmt(s.averageInterval!) : '—', false),
-      (Icons.hourglass_bottom_rounded, 'Tempo total', s.totalDuration != null ? fmt(s.totalDuration!) : '—', false),
-      (Icons.arrow_upward_rounded, 'Maior contração', s.longestDuration != null ? fmt(s.longestDuration!) : '—', false),
-      (Icons.arrow_downward_rounded, 'Menor contração', s.shortestDuration != null ? fmt(s.shortestDuration!) : '—', false),
+      (Icons.favorite_rounded, 'Contrações', '${s.count}'),
+      (Icons.timer_outlined, 'Duração média', s.averageDuration != null ? formatDuration(s.averageDuration!) : '—'),
+      (Icons.swap_horiz_rounded, 'Intervalo médio', s.averageInterval != null ? formatDuration(s.averageInterval!) : '—'),
+      (Icons.hourglass_bottom_rounded, 'Tempo total', s.totalDuration != null ? formatDuration(s.totalDuration!) : '—'),
+      (Icons.arrow_upward_rounded, 'Maior contração', s.longestDuration != null ? formatDuration(s.longestDuration!) : '—'),
+      (Icons.arrow_downward_rounded, 'Menor contração', s.shortestDuration != null ? formatDuration(s.shortestDuration!) : '—'),
     ];
 
     return Padding(
@@ -213,9 +207,8 @@ class _StatCard extends StatelessWidget {
 
 class _ContractionChart extends StatefulWidget {
   final DayStats stats;
-  final ThemeData theme;
 
-  const _ContractionChart({required this.stats, required this.theme});
+  const _ContractionChart({required this.stats});
 
   @override
   State<_ContractionChart> createState() => _ContractionChartState();
@@ -226,6 +219,7 @@ class _ContractionChartState extends State<_ContractionChart> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final slots = widget.stats.contractionsBySlot;
     final maxY = slots.fold(0, (m, v) => v > m ? v : m).toDouble();
 
@@ -237,10 +231,10 @@ class _ContractionChartState extends State<_ContractionChart> {
           BarChartRodData(
             toY: slots[i].toDouble(),
             color: slots[i] == 0
-                ? widget.theme.colorScheme.outlineVariant
+                ? theme.colorScheme.outlineVariant
                 : isTouched
-                    ? widget.theme.colorScheme.error
-                    : widget.theme.colorScheme.primary,
+                    ? theme.colorScheme.error
+                    : theme.colorScheme.primary,
             width: 9,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
           ),

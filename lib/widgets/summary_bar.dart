@@ -3,18 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/contraction.dart';
+import '../models/day_stats.dart';
 import '../providers/contraction_provider.dart';
 import '../utils/app_toast.dart';
+import '../utils/format_utils.dart';
 
 class SummaryBar extends StatelessWidget {
   const SummaryBar({super.key});
-
-  static String _fmt(Duration d) {
-    final s = d.inSeconds.remainder(60);
-    if (d.inMinutes == 0) return '${s}s';
-    if (s == 0) return '${d.inMinutes}min';
-    return '${d.inMinutes}min ${s}s';
-  }
 
   static String _buildSummaryText({
     required List<Contraction> recent,
@@ -23,23 +18,22 @@ class SummaryBar extends StatelessWidget {
     required Duration? avgDuration,
   }) {
     final now = DateTime.now();
-    final dtFmt = DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
-    final timeFmt = DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
+    final fmt = DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
 
     final buf = StringBuffer();
     buf.writeln('Contrações — resumo da última hora');
-    buf.writeln('Gerado em ${dtFmt.format(now)}');
+    buf.writeln('Gerado em ${fmt.format(now)}');
     buf.writeln();
     buf.writeln('Total: $count ${count == 1 ? 'contração' : 'contrações'}');
-    buf.writeln('Intervalo médio: ${avgInterval != null ? _fmt(avgInterval) : '—'}');
-    buf.writeln('Duração média: ${avgDuration != null ? _fmt(avgDuration) : '—'}');
+    buf.writeln('Intervalo médio: ${avgInterval != null ? formatDuration(avgInterval) : '—'}');
+    buf.writeln('Duração média: ${avgDuration != null ? formatDuration(avgDuration) : '—'}');
     buf.writeln();
     buf.writeln('Detalhes:');
     for (int i = 0; i < recent.length; i++) {
       final c = recent[i];
-      final dur = c.duration != null ? _fmt(c.duration!) : 'em andamento';
+      final dur = c.duration != null ? formatDuration(c.duration!) : 'em andamento';
       final pain = c.painLevel != null ? ' — ${c.painLevel!.label}' : '';
-      buf.writeln('${i + 1}. ${timeFmt.format(c.startTime)} — $dur$pain');
+      buf.writeln('${i + 1}. ${fmt.format(c.startTime)} — $dur$pain');
     }
     return buf.toString().trimRight();
   }
@@ -55,30 +49,9 @@ class SummaryBar extends StatelessWidget {
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
     final count = recent.length;
-
-    final completed = recent.where((c) => !c.isActive).toList();
-
-    Duration? avgInterval;
-    if (completed.length >= 2) {
-      final gaps = <Duration>[];
-      for (int i = 1; i < completed.length; i++) {
-        final gap = completed[i].startTime.difference(completed[i - 1].endTime!);
-        if (gap > Duration.zero) gaps.add(gap);
-      }
-      if (gaps.isNotEmpty) {
-        final total = gaps.fold<Duration>(Duration.zero, (s, d) => s + d);
-        avgInterval = Duration(microseconds: total.inMicroseconds ~/ gaps.length);
-      }
-    }
-
-    Duration? avgDuration;
-    if (completed.isNotEmpty) {
-      final total = completed.fold<Duration>(
-        Duration.zero,
-        (s, c) => s + c.duration!,
-      );
-      avgDuration = Duration(microseconds: total.inMicroseconds ~/ completed.length);
-    }
+    final stats = DayStats(recent);
+    final avgInterval = stats.averageInterval;
+    final avgDuration = stats.averageDuration;
 
     final theme = Theme.of(context);
     final hasData = count > 0;
@@ -110,7 +83,7 @@ class SummaryBar extends StatelessWidget {
                     Expanded(
                       child: _Metric(
                         icon: Icons.swap_horiz_rounded,
-                        value: avgInterval != null ? _fmt(avgInterval) : '—',
+                        value: avgInterval != null ? formatDuration(avgInterval) : '—',
                         label: 'intervalo\nmédio',
                       ),
                     ),
