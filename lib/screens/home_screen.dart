@@ -102,11 +102,11 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 32),
+            const SizedBox(height: 12),
             const Center(child: ContractionButton()),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             const SummaryBar(),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             TabBar(
               tabs: const [
                 Tab(icon: Icon(Icons.list_alt_outlined), text: 'Histórico'),

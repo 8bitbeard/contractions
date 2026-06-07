@@ -24,8 +24,8 @@ class ContractionButton extends StatelessWidget {
           onTap: provider.toggleContraction,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: 180,
-            height: 180,
+            width: 140,
+            height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isActive
@@ -49,14 +49,14 @@ class ContractionButton extends StatelessWidget {
                   Icon(
                     isActive ? Icons.stop : Icons.fiber_manual_record,
                     color: Colors.white,
-                    size: 48,
+                    size: 36,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
                     isActive ? 'Parar' : 'Iniciar',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -65,14 +65,14 @@ class ContractionButton extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         AnimatedOpacity(
           opacity: isActive ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 300),
           child: Text(
             _formatDuration(elapsed),
             style: TextStyle(
-              fontSize: 32,
+              fontSize: 26,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.error,
               fontFeatures: const [FontFeature.tabularFigures()],
