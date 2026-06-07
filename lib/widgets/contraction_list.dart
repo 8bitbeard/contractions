@@ -198,10 +198,7 @@ class _ContractionTile extends StatelessWidget {
       ),
       subtitle: isActive
           ? null
-          : Text(
-              'Duração: ${ContractionList.formatDuration(duration!)}',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-            ),
+          : _ContractionSubtitle(contraction: contraction, duration: duration!),
       trailing: isActive
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -233,6 +230,53 @@ class _ContractionTile extends StatelessWidget {
                 ),
               ],
             ),
+    );
+  }
+}
+
+class _ContractionSubtitle extends StatelessWidget {
+  final Contraction contraction;
+  final Duration duration;
+
+  const _ContractionSubtitle({required this.contraction, required this.duration});
+
+  static const _painIcons = {
+    PainLevel.none: Icons.sentiment_very_satisfied_rounded,
+    PainLevel.mild: Icons.sentiment_satisfied_rounded,
+    PainLevel.moderate: Icons.sentiment_dissatisfied_rounded,
+    PainLevel.strong: Icons.sentiment_very_dissatisfied_rounded,
+  };
+
+  static const _painColors = {
+    PainLevel.none: Color(0xFF4CAF50),
+    PainLevel.mild: Color(0xFFFFC107),
+    PainLevel.moderate: Color(0xFFFF9800),
+    PainLevel.strong: Color(0xFFF44336),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final pain = contraction.painLevel;
+    return Row(
+      children: [
+        Text(
+          'Duração: ${ContractionList.formatDuration(duration)}',
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+        ),
+        if (pain != null) ...[
+          const SizedBox(width: 8),
+          Icon(_painIcons[pain]!, color: _painColors[pain]!, size: 14),
+          const SizedBox(width: 3),
+          Text(
+            pain.label,
+            style: TextStyle(
+              color: _painColors[pain]!,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
