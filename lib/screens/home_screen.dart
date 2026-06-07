@@ -14,13 +14,26 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   bool _alertShown = false;
+  late final TabController _tabController;
+  bool _showButton = true;
 
   @override
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      final onHistorico = _tabController.index == 0;
+      if (_showButton != onHistorico) setState(() => _showButton = onHistorico);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _checkLaborAlert() {
@@ -83,81 +96,86 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 12),
-              const SummaryBar(),
-              const SizedBox(height: 6),
-              TabBar(
-                tabs: const [
-                  Tab(icon: Icon(Icons.list_alt_outlined), text: 'Histórico'),
-                  Tab(icon: Icon(Icons.bar_chart_rounded), text: 'Estatísticas'),
-                ],
-                labelColor: theme.colorScheme.primary,
-                unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-                indicatorColor: theme.colorScheme.primary,
-                dividerColor: theme.colorScheme.outlineVariant,
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    TabBarView(
-                      children: [
-                        SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: const [
-                              ContractionList(),
-                              SizedBox(height: 24),
-                            ],
-                          ),
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 12),
+            const SummaryBar(),
+            const SizedBox(height: 6),
+            TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(icon: Icon(Icons.list_alt_outlined), text: 'Histórico'),
+                Tab(icon: Icon(Icons.bar_chart_rounded), text: 'Estatísticas'),
+              ],
+              labelColor: theme.colorScheme.primary,
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+              indicatorColor: theme.colorScheme.primary,
+              dividerColor: theme.colorScheme.outlineVariant,
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  TabBarView(
+                    controller: _tabController,
+                    children: [
+                      SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: const [
+                            ContractionList(),
+                            SizedBox(height: 24),
+                          ],
                         ),
-                        SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: const [
-                              StatsSection(),
-                            ],
-                          ),
+                      ),
+                      SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: const [
+                            StatsSection(),
+                          ],
                         ),
-                      ],
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: IgnorePointer(
-                        child: Container(
-                          height: 72,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                theme.colorScheme.surface.withAlpha(0),
-                                theme.colorScheme.surface,
-                              ],
-                            ),
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: IgnorePointer(
+                      child: Container(
+                        height: 72,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              theme.colorScheme.surface.withAlpha(0),
+                              theme.colorScheme.surface,
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 36, bottom: 24),
-                child: Center(
-                  child: ContractionButton(onContractionCompleted: _checkLaborAlert),
-                ),
-              ),
-            ],
-          ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeInOut,
+              child: _showButton
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 36, bottom: 24),
+                      child: Center(
+                        child: ContractionButton(onContractionCompleted: _checkLaborAlert),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
         ),
       ),
     );
