@@ -24,6 +24,12 @@ Aplicativo para registro e acompanhamento de contrações uterinas durante o tra
   <img src="screenshots/06_estatisticas_grafico.png" width="200" alt="Métricas e gráfico"/>
 </p>
 
+### Alerta de trabalho de parto ativo
+
+<p align="center">
+  <img src="screenshots/08_alerta_maternidade.png" width="200" alt="Alerta de trabalho de parto ativo"/>
+</p>
+
 ## Funcionalidades
 
 **Registro**
