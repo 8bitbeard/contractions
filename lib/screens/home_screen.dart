@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               curve: Curves.easeInOut,
               child: _showButton
                   ? Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 16),
+                      padding: const EdgeInsets.only(top: 8, bottom: 6),
                       child: Center(
                         child: ContractionButton(onContractionCompleted: _checkLaborAlert),
                       ),
