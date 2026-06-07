@@ -21,10 +21,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   bool _showButton = true;
   bool _showScrollTop = false;
 
-  // Altura do centro do botão a partir do rodapé (raio + padding inferior).
-  static const double _buttonRadius = 75;
+  // Geometria do botão (deve refletir o tamanho definido em ContractionButton).
+  static const double _buttonSize = 150;
+  static const double _buttonTopPad = 4;
   static const double _buttonBottomPad = 6;
-  static const double _buttonCenter = _buttonRadius + _buttonBottomPad; // 81px
+  // Distâncias a partir do rodapé da tela:
+  static const double _buttonCenterFromBottom =
+      _buttonBottomPad + _buttonSize / 2; // 81 px
+  static const double _buttonTopFromBottom =
+      _buttonBottomPad + _buttonSize; // 156 px
+  static const double _buttonContainerH =
+      _buttonTopPad + _buttonSize + _buttonBottomPad; // 160 px
+  // Zona de fade acima do botão.
+  static const double _fadeZoneH = 200;
+  static const double _overlayH = _fadeZoneH + _buttonContainerH; // 360 px
 
   @override
   void initState() {
@@ -158,56 +168,70 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     ],
                   ),
 
-                  // Gradiente: transparente no topo → sólido no centro do botão.
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: _buttonCenter,
-                    height: 210,
-                    child: AnimatedOpacity(
-                      opacity: _showButton ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeInOut,
-                      child: IgnorePointer(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                theme.colorScheme.surface.withAlpha(0),
-                                theme.colorScheme.surface,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Área sólida + botão (do centro do botão para baixo).
+                  // Overlay unificado: gradiente com paradas precisas + botão.
+                  //
+                  // Paradas calculadas de cima para baixo no total de _overlayH:
+                  //   stop 0.0  → topo da zona de fade    → alpha 0   (transparente)
+                  //   stopTop   → topo do botão            → alpha 64  (~25% opaco)
+                  //   stopCenter→ centro do botão          → alpha 255 (sólido)
+                  //   stop 1.0  → base da tela             → alpha 255 (sólido)
                   Positioned(
                     left: 0,
                     right: 0,
                     bottom: 0,
+                    height: _overlayH,
                     child: AnimatedOpacity(
                       opacity: _showButton ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 280),
                       curve: Curves.easeInOut,
-                      child: IgnorePointer(
-                        ignoring: !_showButton,
-                        child: Container(
-                          color: theme.colorScheme.surface,
-                          padding: const EdgeInsets.only(
-                            top: 4,
-                            bottom: _buttonBottomPad,
-                          ),
-                          child: Center(
-                            child: ContractionButton(
-                              onContractionCompleted: _checkLaborAlert,
+                      child: Stack(
+                        children: [
+                          // Gradiente (não recebe toques).
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    stops: [
+                                      0.0,
+                                      (_overlayH - _buttonTopFromBottom) / _overlayH,
+                                      (_overlayH - _buttonCenterFromBottom) / _overlayH,
+                                      1.0,
+                                    ],
+                                    colors: [
+                                      theme.colorScheme.surface.withAlpha(0),
+                                      theme.colorScheme.surface.withAlpha(64),
+                                      theme.colorScheme.surface,
+                                      theme.colorScheme.surface,
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          // Botão posicionado na base do overlay.
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: IgnorePointer(
+                              ignoring: !_showButton,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  top: _buttonTopPad,
+                                  bottom: _buttonBottomPad,
+                                ),
+                                child: Center(
+                                  child: ContractionButton(
+                                    onContractionCompleted: _checkLaborAlert,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -215,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   // Botão de scroll ao topo (só no histórico, fora do topo).
                   Positioned(
                     right: 16,
-                    bottom: _buttonCenter + 210 + 12,
+                    bottom: _overlayH + 8,
                     child: AnimatedOpacity(
                       opacity: (_showScrollTop && _showButton) ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 220),
