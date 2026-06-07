@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     ],
                                     colors: [
                                       theme.colorScheme.surface.withAlpha(0),
-                                      theme.colorScheme.surface.withAlpha(128),
+                                      theme.colorScheme.surface.withAlpha(191),
                                       theme.colorScheme.surface,
                                       theme.colorScheme.surface,
                                     ],
