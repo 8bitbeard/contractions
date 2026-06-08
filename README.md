@@ -58,20 +58,26 @@ Aplicativo para registro e acompanhamento de contrações uterinas durante o tra
   </tr>
 </table>
 
-### Tema escuro · Alerta de trabalho de parto
+### Editar e excluir · Tema escuro · Alerta de trabalho de parto
 
 <table align="center">
   <tr>
+    <td align="center"><b>Confirmar exclusão</b></td>
+    <td align="center"></td>
     <td align="center"><b>Modo escuro</b></td>
     <td align="center"></td>
     <td align="center"><b>Alerta de maternidade</b></td>
   </tr>
   <tr>
+    <td align="center"><img src="screenshots/09_excluir.png" width="190" alt="Confirmação de exclusão"/></td>
+    <td align="center" valign="middle"><b>&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
     <td align="center"><img src="screenshots/07_dark_mode.png" width="190" alt="Tema escuro"/></td>
     <td align="center" valign="middle"><b>&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
     <td align="center"><img src="screenshots/08_alerta_maternidade.png" width="190" alt="Alerta de trabalho de parto ativo"/></td>
   </tr>
   <tr>
+    <td align="center"><sub>Swipe para a esquerda abre<br/>o dialog de confirmação</sub></td>
+    <td></td>
     <td align="center"><sub>Toggle no card de resumo,<br/>preferência salva entre sessões</sub></td>
     <td></td>
     <td align="center"><sub>Disparado automaticamente com<br/>5+ contrações em ≤ 10 min</sub></td>
